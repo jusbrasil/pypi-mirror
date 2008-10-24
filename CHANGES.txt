@@ -1,5 +1,10 @@
 Change history
 ~~~~~~~~~~~~~~
+1.0.1 (2008-10-24)
+----------------
+
+- added --update-fetch and --initial-fetch options
+
 1.0 (2008-10-06)
 ----------------
 
