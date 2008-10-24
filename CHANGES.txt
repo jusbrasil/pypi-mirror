@@ -1,6 +1,11 @@
 Change history
 ~~~~~~~~~~~~~~
 
+1.0.4 (2008-10-24)
+------------------
+
+- add version number to HTTP user-agent header
+
 1.0.3 (2008-10-24)
 ------------------
 
@@ -21,6 +26,7 @@ Change history
 ----------------
 
 - Release and code move to launchpad
+
 
 0.2.10 (2008-09-09)
 -------------------

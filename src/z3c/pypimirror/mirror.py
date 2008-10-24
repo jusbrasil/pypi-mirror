@@ -24,7 +24,7 @@ import socket
 import tempfile
 import urlparse
 import time
-from pkg_resources import parse_version
+import pkg_resources
 from BeautifulSoup import BeautifulSoup
 from glob import fnmatch
 from md5 import md5
@@ -37,6 +37,15 @@ socket.setdefaulttimeout(timeout)
 LOG = None
 
 dev_package_regex = re.compile(r'\ddev[-_]')
+
+def urlopen(url):
+    """ This behaves exactly like urllib2.urlopen, but injects a header
+        User-Agent: z3c.pypimirror/1.0.2
+    """
+    version = pkg_resources.working_set.by_key["z3c.pypimirror"].version
+    headers = { 'User-Agent' : 'z3c.pypimirror/%s' % version }
+    req = urllib2.Request(url, None, headers)
+    return urllib2.urlopen(req)
 
 class Stats:
     """ This is just for statistics """
@@ -146,7 +155,7 @@ class Package:
 
     def _fetch_index(self):
         try:
-            html = util.fetch_url(self.url()).read()
+            html = urlopen(self.url()).read()
         except urllib2.HTTPError, v:
             if '404' in str(v):             # sigh
                 raise PackageError("Package not available (404): %s" % self.url())
@@ -199,7 +208,7 @@ class Package:
 
                 if follow_external_index_pages:
                     try:
-                        site = util.fetch_url(link)
+                        site = urlopen(link)
                     except Exception, e:
                         LOG.warn('Unload downloading %s (%s)' % (link, e))
                         continue
@@ -233,7 +242,7 @@ class Package:
                         """ Sort all download links by package version """
                         parts1 = urlparse.urlsplit(url1)[2].split('/')[-1]
                         parts2 = urlparse.urlsplit(url2)[2].split('/')[-1]
-                        return cmp(parse_version(parts1), parse_version(parts2))
+                        return cmp(pkg_resources.parse_version(parts1), pkg_resources.parse_version(parts2))
 
                     # and return the 20 latest files
                     candidates.sort(sort_candidates)
@@ -284,7 +293,7 @@ class Package:
         """ fetches a file and checks for the md5_hex if given
         """
         try:
-            data = util.fetch_url(url).read()
+            data = urlopen(url).read()
         except urllib2.HTTPError, v:
             if '404' in str(v):             # sigh
                 raise PackageError("404: %s" % url)
@@ -324,7 +333,7 @@ class Package:
             LOG.warn('Could not obtain content-length through a HEAD request from %s (%s)' % (link, e))
 
         try:
-            return long(util.fetch_url(link).headers.get("content-length"))
+            return long(urlopen(link).headers.get("content-length"))
         except:
             return 0
 
@@ -682,13 +691,13 @@ def run(args=None):
     if options.log_filename:
         log_filename = options.log_filename
 
-
     if options.initial_fetch:
         package_list = PypiPackageList().list(package_matches, incremental=False)
     elif options.update_fetch:
         package_list = PypiPackageList().list(package_matches, incremental=True)
     else: 
         raise ValueError('You must either specify the --initial-fetch or --update-fetch option ')
+
     mirror = Mirror(config["mirror_file_path"])
     lock = zc.lockfile.LockFile(os.path.join(config["mirror_file_path"], config["lock_file_name"]))
     LOG = getLogger(filename=log_filename,
