@@ -24,7 +24,7 @@ import socket
 import tempfile
 import urlparse
 import time
-from pkg_resources import parse_version
+import pkg_resources
 from BeautifulSoup import BeautifulSoup
 from glob import fnmatch
 from md5 import md5
@@ -42,7 +42,8 @@ def urlopen(url):
     """ This behaves exactly like urllib2.urlopen, but injects a header
         User-Agent: z3c.pypimirror/1.0.2
     """
-    headers = { 'User-Agent' : 'z3c.pypimirror/1.0.2' }
+    version = pkg_resources.working_set.by_key["z3c.pypimirror"].version
+    headers = { 'User-Agent' : 'z3c.pypimirror/%s' % version }
     req = urllib2.Request(url, None, headers)
     return urllib2.urlopen(req)
 
@@ -241,7 +242,7 @@ class Package:
                         """ Sort all download links by package version """
                         parts1 = urlparse.urlsplit(url1)[2].split('/')[-1]
                         parts2 = urlparse.urlsplit(url2)[2].split('/')[-1]
-                        return cmp(parse_version(parts1), parse_version(parts2))
+                        return cmp(pkg_resources.parse_version(parts1), pkg_resources.parse_version(parts2))
 
                     # and return the 20 latest files
                     candidates.sort(sort_candidates)
