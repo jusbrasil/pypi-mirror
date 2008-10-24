@@ -38,6 +38,14 @@ LOG = None
 
 dev_package_regex = re.compile(r'\ddev[-_]')
 
+def urlopen(url):
+    """ This behaves exactly like urllib2.urlopen, but injects a header
+        User-Agent: z3c.pypimirror/1.0.2
+    """
+    headers = { 'User-Agent' : 'z3c.pypimirror/1.0.2' }
+    req = urllib2.Request(url, None, headers)
+    return urllib2.urlopen(req)
+
 class Stats:
     """ This is just for statistics """
     def __init__(self):
@@ -146,7 +154,7 @@ class Package:
 
     def _fetch_index(self):
         try:
-            html = urllib2.urlopen(self.url()).read()
+            html = urlopen(self.url()).read()
         except urllib2.HTTPError, v:
             if '404' in str(v):             # sigh
                 raise PackageError("Package not available (404): %s" % self.url())
@@ -199,7 +207,7 @@ class Package:
 
                 if follow_external_index_pages:
                     try:
-                        site = urllib2.urlopen(link)
+                        site = urlopen(link)
                     except Exception, e:
                         LOG.warn('Unload downloading %s (%s)' % (link, e))
                         continue
@@ -284,7 +292,7 @@ class Package:
         """ fetches a file and checks for the md5_hex if given
         """
         try:
-            data = urllib2.urlopen(url).read()
+            data = urlopen(url).read()
         except urllib2.HTTPError, v:
             if '404' in str(v):             # sigh
                 raise PackageError("404: %s" % url)
@@ -324,7 +332,7 @@ class Package:
             LOG.warn('Could not obtain content-length through a HEAD request from %s (%s)' % (link, e))
 
         try:
-            return long(urllib2.urlopen(link).headers.get("content-length"))
+            return long(urlopen(link).headers.get("content-length"))
         except:
             return 0
 
