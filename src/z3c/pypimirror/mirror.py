@@ -146,7 +146,7 @@ class Package:
 
     def _fetch_index(self):
         try:
-            html = urllib2.urlopen(self.url()).read()
+            html = util.fetch_url(self.url()).read()
         except urllib2.HTTPError, v:
             if '404' in str(v):             # sigh
                 raise PackageError("Package not available (404): %s" % self.url())
@@ -199,7 +199,7 @@ class Package:
 
                 if follow_external_index_pages:
                     try:
-                        site = urllib2.urlopen(link)
+                        site = util.fetch_url(link)
                     except Exception, e:
                         LOG.warn('Unload downloading %s (%s)' % (link, e))
                         continue
@@ -284,7 +284,7 @@ class Package:
         """ fetches a file and checks for the md5_hex if given
         """
         try:
-            data = urllib2.urlopen(url).read()
+            data = util.fetch_url(url).read()
         except urllib2.HTTPError, v:
             if '404' in str(v):             # sigh
                 raise PackageError("404: %s" % url)
@@ -324,7 +324,7 @@ class Package:
             LOG.warn('Could not obtain content-length through a HEAD request from %s (%s)' % (link, e))
 
         try:
-            return long(urllib2.urlopen(link).headers.get("content-length"))
+            return long(util.fetch_url(link).headers.get("content-length"))
         except:
             return 0
 

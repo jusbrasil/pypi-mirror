@@ -30,7 +30,7 @@ def isASCII(s):
         raise TypeError('isASCII() requires a string or unicode string')
 
 
-def fetch_url(url)
+def fetch_url(url):
     req = urllib2.Request(url)
     req.add_header('user-agent', 'z3c.pypimirror')
     return urllib2.urlopen(req)
