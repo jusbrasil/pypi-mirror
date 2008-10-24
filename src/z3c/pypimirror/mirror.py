@@ -88,7 +88,7 @@ class PypiPackageList:
     def __init__(self, pypi_xmlrpc_url='http://pypi.python.org/pypi'):
         self._pypi_xmlrpc_url = pypi_xmlrpc_url
 
-    def list(self, filter_by=None):
+    def list(self, filter_by=None, incremental=False):
         server = xmlrpclib.Server(self._pypi_xmlrpc_url)
         packages = server.list_packages()
         if not filter_by:
@@ -642,6 +642,10 @@ def run(args=None):
                       default=False, help='verbose on')
     parser.add_option('-f', '--log-filename', dest='log_filename', action='store',
                       default=False, help='Name of logfile')
+    parser.add_option('-I', '--initial-fetch', dest='initial_fetch', action='store_true',
+                      default=False, help='Initial PyPI mirror fetch')
+    parser.add_option('-U', '--update-fetch', dest='update_fetch', action='store_true',
+                      default=False, help='Perform incremental update of the mirror')
     parser.add_option('-c', '--log-console', dest='log_console', action='store_true',
                       default=False, help='Also log to console')
     parser.add_option('-i', '--indexes-only', dest='indexes_only', action='store_true',
@@ -670,7 +674,14 @@ def run(args=None):
     if options.log_filename:
         log_filename = options.log_filename
 
-    package_list = PypiPackageList().list(package_matches)
+
+    if options.initial_fetch:
+        package_list = PypiPackageList().list(package_matches, incremental=False)
+    elif options.update_fetch:
+        package_list = PypiPackageList().list(package_matches, incremental=True)
+    else: 
+        raise ValueError('You must either specify the --initial-fetch or --update-fetch option ')
+
     mirror = Mirror(config["mirror_file_path"])
     lock = zc.lockfile.LockFile(os.path.join(config["mirror_file_path"], config["lock_file_name"]))
     LOG = getLogger(filename=log_filename,
