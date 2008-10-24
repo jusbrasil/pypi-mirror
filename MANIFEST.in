@@ -1,4 +1,3 @@
 include *.txt
-recursive-include src *.txt *.py *.zcml *.csv
+recursive-include src *.txt *.py *.zcml *.sample
 include docs/*.txt
-include CHANGES.txt
