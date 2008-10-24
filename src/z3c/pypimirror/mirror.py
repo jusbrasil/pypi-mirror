@@ -23,6 +23,7 @@ import zc.lockfile
 import socket
 import tempfile
 import urlparse
+import time
 from pkg_resources import parse_version
 from BeautifulSoup import BeautifulSoup
 from glob import fnmatch
@@ -81,14 +82,14 @@ class Stats:
         return ret
 
 
-class PypiPackageList:
+class PypiPackageList(object):
     """
         This fetches and represents a package list
     """
     def __init__(self, pypi_xmlrpc_url='http://pypi.python.org/pypi'):
         self._pypi_xmlrpc_url = pypi_xmlrpc_url
 
-    def list(self, filter_by=None, incremental=False):
+    def list(self, filter_by=None, incremental=False, fetch_since_days=7):
         server = xmlrpclib.Server(self._pypi_xmlrpc_url)
         packages = server.list_packages()
         if not filter_by:
@@ -99,7 +100,14 @@ class PypiPackageList:
             if not True in [fnmatch.fnmatch(package, f) for f in filter_by]:
                 continue
             filtered_packages.append(package)
-        return filtered_packages
+
+        if incremental:
+            changelog = server.changelog(int(time.time() - fetch_since_days*24*3600))
+            changed_packages = [tp[0] for tp in changelog]
+            changed_packages = [package for package in changed_packages if package in filtered_packages]
+            return changed_packages
+        else:
+            return filtered_packages
 
 
 class PackageError(Exception):
