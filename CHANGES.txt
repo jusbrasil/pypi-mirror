@@ -11,7 +11,7 @@ Change history
 - Release and code move to launchpad
 
 0.2.10 (2008-09-09)
-------------------
+-------------------
 
 - demo release for DZUG tutorial day
 
