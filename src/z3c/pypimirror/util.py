@@ -7,6 +7,8 @@
 ################################################################
 
 
+import urllib2
+
 def isASCII(s):
     """ Checks if a string/unicode string contains only ASCII chars.  """
 
@@ -26,4 +28,10 @@ def isASCII(s):
 
     else:
         raise TypeError('isASCII() requires a string or unicode string')
+
+
+def fetch_url(url)
+    req = urllib2.Request(url)
+    req.add_header('user-agent', 'z3c.pypimirror')
+    return urllib2.urlopen(req)
 
