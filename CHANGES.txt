@@ -1,6 +1,13 @@
 Change history
 ~~~~~~~~~~~~~~
 
+1.0.5 (2008-10-27)
+------------------
+
+- disabled 'cleanup' option since it does play nicely
+  with the --update-fetch option
+
+
 1.0.4 (2008-10-24)
 ------------------
 
