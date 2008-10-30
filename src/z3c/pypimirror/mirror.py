@@ -392,13 +392,13 @@ class Mirror(object):
 
     def index_html(self):
         content = self._index_html()
-        open(os.path.join(self.base_path, "index2.html"), "wb").write(content)
+        open(os.path.join(self.base_path, "index.html"), "wb").write(content)
 
     def full_html(self, full_list):
         header = "<html><body><h1>PyPi Mirror</h1><h2>Last update: " + \
                  time.strftime("%c %Z")+"</h2>\n"
         footer = "</body></html>\n"
-        fp = file(os.path.join(self.base_path, "index.html"), "wb")
+        fp = file(os.path.join(self.base_path, "full.html"), "wb")
         fp.write(header)
         fp.write("<br />\n".join(full_list))
         fp.write(footer)
