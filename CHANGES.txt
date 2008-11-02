@@ -1,10 +1,33 @@
 Change history
 ~~~~~~~~~~~~~~
 
-1.0.1 (2008-10-24)
-----------------
+1.0.5 (2008-10-27)
+------------------
 
-- added --update-fetch and --initial-fetch options
+- disabled 'cleanup' option since it does play nicely
+  with the --update-fetch option
+
+
+1.0.4 (2008-10-24)
+------------------
+
+- add version number to HTTP user-agent header
+
+1.0.3 (2008-10-24)
+------------------
+
+- using fetch_url() for making HTTP requests
+  in order to specify a dedicated user-agent header
+
+1.0.2 (2008-10-24)
+------------------
+
+- fixed packaging issues
+
+1.0.1 (2008-10-24)
+------------------
+
+- new options: --initial-fetch and --update-mode
 
 1.0 (2008-10-06)
 ----------------
@@ -13,7 +36,7 @@ Change history
 
 
 0.2.10 (2008-09-09)
-------------------
+-------------------
 
 - demo release for DZUG tutorial day
 

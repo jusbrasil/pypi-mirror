@@ -47,7 +47,7 @@ def urlopen(url):
     req = urllib2.Request(url, None, headers)
     return urllib2.urlopen(req)
 
-class Stats:
+class Stats(object):
     """ This is just for statistics """
     def __init__(self):
         self._found = []
@@ -122,7 +122,7 @@ class PypiPackageList(object):
 class PackageError(Exception):
     pass
 
-class Package:
+class Package(object):
     """
         This handles the list of versions and fetches the
         files
@@ -337,7 +337,7 @@ class Package:
         except:
             return 0
 
-class Mirror:
+class Mirror(object):
     """ This represents the whole mirror directory
     """
     def __init__(self, base_path):
@@ -392,13 +392,13 @@ class Mirror:
 
     def index_html(self):
         content = self._index_html()
-        open(os.path.join(self.base_path, "index2.html"), "wb").write(content)
+        open(os.path.join(self.base_path, "index.html"), "wb").write(content)
 
     def full_html(self, full_list):
         header = "<html><body><h1>PyPi Mirror</h1><h2>Last update: " + \
                  time.strftime("%c %Z")+"</h2>\n"
         footer = "</body></html>\n"
-        fp = file(os.path.join(self.base_path, "index.html"), "wb")
+        fp = file(os.path.join(self.base_path, "full.html"), "wb")
         fp.write(header)
         fp.write("<br />\n".join(full_list))
         fp.write(footer)
@@ -469,12 +469,14 @@ class Mirror:
                     full_list.append(mirror_package._html_link(base_url, filename, md5_hash))
                     if verbose: 
                         LOG.debug("Found: %s" % filename)
-            if cleanup:
-                mirror_package.cleanup(links, verbose)
+
+# Disabled cleanup for now since it does not deal with the changelog() implementation
+#            if cleanup:
+#                mirror_package.cleanup(links, verbose)
             if create_indexes:
                 mirror_package.index_html(base_url)
-        if cleanup:
-            self.cleanup(package_list, verbose)
+#        if cleanup:
+#            self.cleanup(package_list, verbose)
         if create_indexes:
             self.index_html()
             full_list.sort()
@@ -483,7 +485,7 @@ class Mirror:
         for line in stats.getStats():
             LOG.debug(line)
 
-class MirrorPackage:
+class MirrorPackage(object):
     """ This checks for already existing files and creates the index
     """
     def __init__(self, mirror, package_name):
@@ -560,7 +562,7 @@ class MirrorPackage:
                 self.rm(local_file)
 
 
-class MirrorFile:
+class MirrorFile(object):
     """ This represents a mirrored file. It doesn't have to
         exist.
     """
@@ -690,7 +692,6 @@ def run(args=None):
     log_filename = config['log_filename']
     if options.log_filename:
         log_filename = options.log_filename
-
 
     if options.initial_fetch:
         package_list = PypiPackageList().list(package_matches, incremental=False)

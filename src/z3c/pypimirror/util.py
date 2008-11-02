@@ -7,6 +7,8 @@
 ################################################################
 
 
+import urllib2
+
 def isASCII(s):
     """ Checks if a string/unicode string contains only ASCII chars.  """
 
