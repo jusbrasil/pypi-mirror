@@ -1,6 +1,12 @@
 Change history
 ~~~~~~~~~~~~~~
 
+1.0.6 (2008-10-30)
+------------------
+
+- renamed index.html to full.html
+- renamed index2.html to index.html
+
 1.0.5 (2008-10-27)
 ------------------
 
