@@ -1,6 +1,11 @@
 Change history
 ~~~~~~~~~~~~~~
 
+1.0.7 (2008-11-03)
+------------------
+
+- Added a footer line to index.html indicating the version and no of pkgs synced.
+
 1.0.6 (2008-10-30)
 ------------------
 
