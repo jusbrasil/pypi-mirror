@@ -25,6 +25,7 @@ import socket
 import tempfile
 import urlparse
 import time
+import sets
 import pkg_resources
 from BeautifulSoup import BeautifulSoup
 from glob import fnmatch
@@ -709,6 +710,7 @@ def run(args=None):
     else: 
         raise ValueError('You must either specify the --initial-fetch or --update-fetch option ')
 
+    package_list = Set(package_list)
     mirror = Mirror(config["mirror_file_path"])
     lock = zc.lockfile.LockFile(os.path.join(config["mirror_file_path"], config["lock_file_name"]))
     LOG = getLogger(filename=log_filename,
