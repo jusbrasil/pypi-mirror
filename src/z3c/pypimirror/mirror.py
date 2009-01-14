@@ -543,6 +543,8 @@ class MirrorPackage(object):
         return filenames
 
     def _html_link(self, base_url, filename, md5_hash):
+        if not base_url.endswith('/'):
+            base_url += '/'
         return '<a href="%s%s/%s#md5=%s">%s</a>' % (base_url, self.package_name, filename, md5_hash, filename)
 
     def _index_html(self, base_url):
