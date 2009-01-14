@@ -1,6 +1,12 @@
 Change history
 ~~~~~~~~~~~~~~
 
+1.0.6 (2009-01-14)
+------------------
+
+- fixed generation of (broken links) if base_url did not
+  end with a slash
+
 1.0.5 (2008-10-27)
 ------------------
 
