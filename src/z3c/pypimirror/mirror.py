@@ -730,3 +730,5 @@ def run(args=None):
                       follow_external_index_pages,
                       config["base_url"])
 
+if __name__ == '__main__':
+    sys.exit(run())
