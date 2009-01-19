@@ -289,6 +289,14 @@ class Package(object):
         for filename_match in filename_matches:
             if fnmatch.fnmatch(filename, filename_match):
                 return True
+
+        # perhaps 'filename' is part of a query string, so 
+        # try a regex match 
+        for filename_match in filename_matches:
+            regex = re.compile(r'\\%s\?' % filename_match)
+            if regex.search(filename):
+                return True
+        
         return False
 
     def ls(self, filename_matches=None, external_links=False, follow_external_index_pages=False):
