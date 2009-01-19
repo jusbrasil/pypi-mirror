@@ -477,6 +477,8 @@ class Mirror(object):
                     # urllib2 when the thing was downloaded, as it might
                     # follow redirects.
                     # Example: downman.py?file=configobj-4.3.0.zip
+                    if '?' in filename:
+                        filename = filename[:filename.find('?')]
                     mirror_package.write(filename, data, md5_hash)
                     stats.stored(filename)
                     full_list.append(mirror_package._html_link(base_url, filename, md5_hash))
