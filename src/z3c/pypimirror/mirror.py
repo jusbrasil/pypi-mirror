@@ -201,9 +201,18 @@ class Package(object):
                     continue
                 download_links.add(url)
 
+            if link.renderContents().endswith("home_page"):
+                # we have a download_url!! Yeah.
+                url = link.get("href")
+                if not url:
+                    continue
+                download_links.add(url)
+
         for link in download_links:
             # check if the link points directly to a file
             # and get it if it matches filename_matches
+
+            print link
 
             if filename_matches:
                 if self.matches(link, filename_matches):

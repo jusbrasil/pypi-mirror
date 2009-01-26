@@ -1,5 +1,11 @@
 Change history
 
+1.0.13 (2009-01-26)
+-------------------
+
+- taking 'home_url' into account for mirroring external resources
+
+
 1.0.12 (2009-01-19)
 -------------------
 
