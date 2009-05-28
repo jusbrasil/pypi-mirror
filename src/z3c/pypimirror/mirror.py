@@ -31,6 +31,7 @@ from BeautifulSoup import BeautifulSoup
 from glob import fnmatch
 from md5 import md5
 from logger import getLogger
+import HTMLParser
 
 # timeout in seconds
 timeout = 10
@@ -175,7 +176,10 @@ class Package(object):
         return html
 
     def _fetch_links(self, html):
-        soup = BeautifulSoup(html)
+        try:
+            soup = BeautifulSoup(html)
+        except HTMLParser.HTMLParseError, e:
+            raise PackageError("HTML parse error: %s" % e)
         links = []
         for link in soup.findAll("a"):
             href = link.get("href")

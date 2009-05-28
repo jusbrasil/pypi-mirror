@@ -1,5 +1,11 @@
 Change history
 
+1.0.14 (2009-05-29)
+-------------------
+
+- Ignoring invalid external html pages (thanks Sridhar Ratnakumar)
+
+
 1.0.13 (2009-01-26)
 -------------------
 
