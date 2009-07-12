@@ -239,8 +239,12 @@ class Package(object):
 
                     # we have a valid html page now. Parse links and download them.
                     # They have mostly no md5 hash.
-                    html = site.read()
+                    try:
+                        html = site.read()
+                    except socket.timeout, e:
+                        raise PackageError, 'socket timedout: %s' % e
                     real_download_links = self._fetch_links(html)
+
                     candidates = list()
                     for real_download_link in real_download_links:
                         # build absolute links
