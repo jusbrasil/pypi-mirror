@@ -25,11 +25,17 @@ import socket
 import tempfile
 import urlparse
 import time
-import sets
+try:
+    set
+except NameError:
+    from sets import Set as set
 import pkg_resources
 from BeautifulSoup import BeautifulSoup
 from glob import fnmatch
-from md5 import md5
+try:
+    from hashlib import md5
+except ImportError:
+    from md5 import md5
 from logger import getLogger
 import HTMLParser
 
@@ -739,7 +745,7 @@ def run(args=None):
     else: 
         raise ValueError('You must either specify the --initial-fetch or --update-fetch option ')
 
-    package_list = sets.Set(package_list)
+    package_list = set(package_list)
     mirror = Mirror(config["mirror_file_path"])
     lock = zc.lockfile.LockFile(os.path.join(config["mirror_file_path"], config["lock_file_name"]))
     LOG = getLogger(filename=log_filename,
