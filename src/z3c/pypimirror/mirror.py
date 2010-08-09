@@ -25,17 +25,11 @@ import socket
 import tempfile
 import urlparse
 import time
-try:
-    set
-except NameError:
-    from sets import Set as set
+import sets
 import pkg_resources
 from BeautifulSoup import BeautifulSoup
 from glob import fnmatch
-try:
-    from hashlib import md5
-except ImportError:
-    from md5 import md5
+from md5 import md5
 from logger import getLogger
 import HTMLParser
 
@@ -245,12 +239,8 @@ class Package(object):
 
                     # we have a valid html page now. Parse links and download them.
                     # They have mostly no md5 hash.
-                    try:
-                        html = site.read()
-                    except socket.timeout, e:
-                        raise PackageError, 'socket timedout: %s' % e
+                    html = site.read()
                     real_download_links = self._fetch_links(html)
-
                     candidates = list()
                     for real_download_link in real_download_links:
                         # build absolute links
@@ -331,6 +321,13 @@ class Package(object):
     def _get(self, url, filename, md5_hex=None):
         """ fetches a file and checks for the md5_hex if given
         """
+
+        # since some time in Feb 2009 PyPI uses different and relative URLs
+        # -> complete bullshit
+
+        if url.startswith('../../packages'):
+            url = 'http://pypi.python.org/' + url[6:]
+
         try:
             data = urlopen(url).read()
         except urllib2.HTTPError, v:
@@ -745,7 +742,7 @@ def run(args=None):
     else: 
         raise ValueError('You must either specify the --initial-fetch or --update-fetch option ')
 
-    package_list = set(package_list)
+    package_list = sets.Set(package_list)
     mirror = Mirror(config["mirror_file_path"])
     lock = zc.lockfile.LockFile(os.path.join(config["mirror_file_path"], config["lock_file_name"]))
     LOG = getLogger(filename=log_filename,
