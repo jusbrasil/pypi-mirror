@@ -24,7 +24,6 @@ import zc.lockfile
 import socket
 import tempfile
 import urlparse
-import time
 import sets
 import pkg_resources
 from BeautifulSoup import BeautifulSoup
