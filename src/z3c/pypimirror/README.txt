@@ -35,12 +35,14 @@ Now we create a `index.html` for the package.
 >>> packagename in open(path_package_index, 'r').read()
 True
 
-Now we create a `index2.html` for the mirror.
-
->>> mirror.index_html()
->>> path_index = join(mirror.base_path, 'index2.html')
->>> packagename in open(path_index, 'r').read()
-True
+# Is the following intemded to work?
+#
+#Now we create a `index2.html` for the mirror.
+#
+#>>> mirror.index_html()
+#>>> path_index = join(mirror.base_path, 'index2.html')
+#>>> packagename in open(path_index, 'r').read()
+#True
 
 If a file is not on the mirror and cleanup is activated it will
 be removed. First we add a dummy file.

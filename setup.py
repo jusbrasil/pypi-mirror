@@ -35,7 +35,9 @@ setup(
                         'zc.lockfile',
                         'BeautifulSoup<=3.0.9999'],
     extras_require = {
-        'test': [ 'zc.buildout' ],
+        'test': [ 'zc.buildout',  
+                  'zope.testing',
+                  'interlude' ],
     },
     entry_points = dict(console_scripts=[
         'pypimirror = z3c.pypimirror.mirror:run',

@@ -7,6 +7,7 @@ __docformat__ = 'restructuredtext'
 import unittest
 import zc.buildout.tests
 import zc.buildout.testing
+import interlude
 
 from zope.testing import doctest, renormalizing
 
@@ -52,6 +53,7 @@ def test_suite():
                         # (re.compile('my-[rR]eg[eE]ps'), 'my-regexps')
                         zc.buildout.testing.normalize_path,
                         ]),
+                globs=dict(interact=interlude.interact),
                 ),
             ))
     suite.addTest(unittest.makeSuite(UtilityTests))
