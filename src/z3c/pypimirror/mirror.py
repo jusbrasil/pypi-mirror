@@ -329,7 +329,8 @@ class Package(object):
             url = 'http://pypi.python.org/' + url[6:]
 
         try:
-            data = urlopen(url).read()
+            opener = urlopen(url)
+            data = opener.read()
         except urllib2.HTTPError, v:
             if '404' in str(v):             # sigh
                 raise PackageError("404: %s" % url)
@@ -465,7 +466,8 @@ class Mirror(object):
                 continue
 
             try:
-                links = package.ls(filename_matches, external_links, follow_external_index_pages)
+                links = package.ls(filename_matches, external_links, 
+                                   follow_external_index_pages)
             except PackageError, v:
                 stats.error_404(package_name)
                 LOG.debug("Package not available: %s" % v)
@@ -473,43 +475,42 @@ class Mirror(object):
 
             mirror_package = self.package(package_name)
 
-            for link in links:
-                (url, filename, md5_hash) = link
-                if not md5_hash or not mirror_package.md5_match(filename, md5_hash):
-                    # if we don't have a md5, check for the filesize, if available
-                    # and continue if it's the same:
-                    if not md5_hash:
-                        remote_size = package.content_length(url)
-                        if mirror_package.size_match(filename, remote_size):
-                            if verbose: 
-                                LOG.debug("Found: %s" % filename)
-                            full_list.append(mirror_package._html_link(base_url, filename, md5_hash))
-                            continue
-
-                    try:
-                        data = package.get(link)
-                    except PackageError, v:
-                        stats.error_invalid_url(link)
-                        LOG.info("Invalid URL: %s" % v)
-                        continue
-
-                    # XXX TODO: We should use the filename coming from
-                    # urllib2 when the thing was downloaded, as it might
-                    # follow redirects.
-                    # Example: downman.py?file=configobj-4.3.0.zip
-                    if '?' in filename:
-                        filename = filename[:filename.find('?')]
-                    mirror_package.write(filename, data, md5_hash)
-                    stats.stored(filename)
-                    full_list.append(mirror_package._html_link(base_url, filename, md5_hash))
-                    if verbose: 
-                        LOG.debug("Stored: %s [%d kB]" % (filename, len(data)//1024))
-                else:
+            for (url, url_basename, md5_hash) in links:
+                filename = self._extract_filename(url)
+                                
+                # if we have a md5 check hash and continue if fine.
+                if md5_hash and mirror_package.md5_match(url_basename, md5_hash):
                     stats.found(filename)
-                    full_list.append(mirror_package._html_link(base_url, filename, md5_hash))
+                    full_list.append(mirror_package._html_link(base_url, 
+                                                               url_basename, 
+                                                               md5_hash))
                     if verbose: 
                         LOG.debug("Found: %s" % filename)
-
+                    continue
+                
+                # if we don't have a md5, check for the filesize, if available
+                # and continue if it's the same:
+                if not md5_hash:
+                    remote_size = package.content_length(url)
+                    if mirror_package.size_match(url_basename, remote_size):
+                        if verbose: 
+                            LOG.debug("Found: %s" % url_basename)
+                        full_list.append(mirror_package._html_link(base_url, url_basename, md5_hash))
+                        continue
+                
+                # we need to download it
+                try:
+                    data = package.get((url, filename, md5_hash))
+                except PackageError, v:
+                    stats.error_invalid_url((url, url_basename, md5_hash))
+                    LOG.info("Invalid URL: %s" % v)
+                    continue
+                                       
+                mirror_package.write(filename, data, md5_hash)
+                stats.stored(filename)
+                full_list.append(mirror_package._html_link(base_url, filename, md5_hash))
+                if verbose:
+                    LOG.debug("Stored: %s [%d kB]" % (filename, len(data)//1024))
 # Disabled cleanup for now since it does not deal with the changelog() implementation
 #            if cleanup:
 #                mirror_package.cleanup(links, verbose)
@@ -524,6 +525,40 @@ class Mirror(object):
 
         for line in stats.getStats():
             LOG.debug(line)
+
+    def _extract_filename(self, url):
+        """Get the real filename from an arbitary pypi download url.
+        
+        Reality sucks, but we need to use heuristics here to avoid a many HEAD
+        requests. Use them only if heuristics is not possible. 
+        """
+        # heuristics start
+        url_basename = os.path.basename(url)    
+        
+        # do we have GET parameters? if not, we believe the basename is the filename
+        if '?' not in url_basename:
+            return url_basename
+        
+        # now we have a bunch of crap in get parameters, we need to do a head 
+        # request to get the filename
+        LOG.debug("Head-Request to get filename.")
+        parsed_url = urlparse.urlparse(url)
+        if parsed_url.scheme == 'https':
+            port = parsed_url.port or 443
+            conn = httplib.HTTPSConnection(parsed_url.netloc, port)
+        else:
+            port = parsed_url.port or 80
+            conn = httplib.HTTPConnection(parsed_url.netloc, port)
+        conn.request('HEAD', url)
+        resp = conn.getresponse()
+        content_disposition = resp.getheader("Content-Disposition", None)        
+        if content_disposition:
+            content_disposition = [_.strip() for _ in \
+                                   content_disposition.split(';') \
+                                   if _.strip().startswith('filename')]
+            if len(content_disposition) == 1 and '=' in content_disposition[0]:
+                return content_disposition[0].split('=')[1].strip('"')
+        raise PackageError, "Can't determine filename for url: %s" % url
 
 class MirrorPackage(object):
     """ This checks for already existing files and creates the index
