@@ -6,9 +6,6 @@
 # Published under the Zope Public License 2.1
 ################################################################
 
-
-import urllib2
-
 def isASCII(s):
     """ Checks if a string/unicode string contains only ASCII chars.  """
 
@@ -28,4 +25,3 @@ def isASCII(s):
 
     else:
         raise TypeError('isASCII() requires a string or unicode string')
-
