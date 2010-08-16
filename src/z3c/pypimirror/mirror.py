@@ -537,34 +537,35 @@ class Mirror(object):
         Reality sucks, but we need to use heuristics here to avoid a many HEAD
         requests. Use them only if heuristics is not possible. 
         """
+        fetch_url = url
         do_again = True
         while do_again:
             # heuristics start
-            url_basename = os.path.basename(url)                
+            url_basename = os.path.basename(fetch_url)                
             # do we have GET parameters? 
             # if not, we believe the basename is the filename
             if '?' not in url_basename:
                 return url_basename
             # now we have a bunch of crap in get parameters, we need to do a head 
             # request to get the filename
-            LOG.debug("Head-Request to get filename for %s." % url)
-            parsed_url = urlparse.urlparse(url)
+            LOG.debug("Head-Request to get filename for %s." % fetch_url)
+            parsed_url = urlparse.urlparse(fetch_url)
             if parsed_url.scheme == 'https':
                 port = parsed_url.port or 443
                 conn = httplib.HTTPSConnection(parsed_url.netloc, port)
             else:
                 port = parsed_url.port or 80
                 conn = httplib.HTTPConnection(parsed_url.netloc, port)
-            conn.request('HEAD', url)
+            conn.request('HEAD', fetch_url)
             resp = conn.getresponse()
             if resp.status in (301, 302):
-                url = resp.getheader("Location", None)
-                if url is not None:
+                fetch_url = resp.getheader("Location", None)
+                if fetch_url is not None:
                     continue
                 raise PackageError, "Redirect (%s) from %s without location" % \
-                                    (resp.status, url)
+                                    (resp.status, fetch_url)
             elif resp.status != 200:                
-                raise PackageError, "URL %s can't be fetched" % url
+                raise PackageError, "URL %s can't be fetched" % fetch_url
             do_again = False                                    
         content_disposition = resp.getheader("Content-Disposition", None)
         if content_disposition:
@@ -573,7 +574,10 @@ class Mirror(object):
                                    if _.strip().startswith('filename')]
             if len(content_disposition) == 1 and '=' in content_disposition[0]:
                 return content_disposition[0].split('=')[1].strip('"')
-        raise PackageError, "Can't determine filename for url: %s" % url
+        # so we followed redirects and no meaningful name came back, last 
+        # fallback is to use the basename w/o request parameters.
+        # if this is wrong, it has to fail later. 
+        return os.path.basename(fetch_url[:fetch_url.find('?')])
 
 class MirrorPackage(object):
     """ This checks for already existing files and creates the index
