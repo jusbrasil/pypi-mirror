@@ -24,13 +24,15 @@ import zc.lockfile
 import socket
 import tempfile
 import urlparse
-import sets
 import pkg_resources
 from BeautifulSoup import BeautifulSoup
 from glob import fnmatch
-from md5 import md5
 from logger import getLogger
 import HTMLParser
+try: 
+   from hashlib import md5
+except ImportError:
+   from md5 import md5
 
 # timeout in seconds
 timeout = 10
@@ -475,8 +477,12 @@ class Mirror(object):
             mirror_package = self.package(package_name)
 
             for (url, url_basename, md5_hash) in links:
-                filename = self._extract_filename(url)
-                                
+                try:
+                    filename = self._extract_filename(url)
+                except PackageError, v:
+                    stats.error_invalid_url((url, url_basename, md5_hash))
+                    LOG.info("Invalid URL: %s" % v)
+                    continue                                
                 # if we have a md5 check hash and continue if fine.
                 if md5_hash and mirror_package.md5_match(url_basename, md5_hash):
                     stats.found(filename)
@@ -786,7 +792,7 @@ def run(args=None):
     else: 
         raise ValueError('You must either specify the --initial-fetch or --update-fetch option ')
 
-    package_list = sets.Set(package_list)
+    package_list = set(package_list)
     mirror = Mirror(config["mirror_file_path"])
     lock = zc.lockfile.LockFile(os.path.join(config["mirror_file_path"], config["lock_file_name"]))
     LOG = getLogger(filename=log_filename,
