@@ -3,6 +3,9 @@ Change history
 1.0.16 (unreleased)
 -------------------
 
+- added more or less sane filename detection heuristics (filename from url)
+- fetch-since-days is configurable now.
+
 1.0.15 (20010-02-08)
 -------------------
 

@@ -9,6 +9,9 @@ base_url = http://your-host.com/
 # lock file to avoid duplicate runs of the mirror script
 lock_file_name = /tmp/pypi-poll-access.lock
 
+# days to fetch in past on update
+fetch_since_days = 7 
+
 # Pattern for package files, only those matching will be mirrored
 filename_matches =
     *.zip
@@ -22,7 +25,7 @@ filename_matches =
 package_matches = 
     zope.*
     plone.*
-
+    
 # remove packages not on pypi (or externals) anymore
 cleanup = True
 
