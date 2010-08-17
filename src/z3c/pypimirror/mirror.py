@@ -217,9 +217,6 @@ class Package(object):
         for link in download_links:
             # check if the link points directly to a file
             # and get it if it matches filename_matches
-
-            print link
-
             if filename_matches:
                 if self.matches(link, filename_matches):
                     yield link
