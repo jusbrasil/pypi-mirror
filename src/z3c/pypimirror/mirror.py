@@ -556,8 +556,11 @@ class Mirror(object):
             else:
                 port = parsed_url.port or 80
                 conn = httplib.HTTPConnection(parsed_url.netloc, port)
-            conn.request('HEAD', fetch_url)
-            resp = conn.getresponse()
+            try:
+                conn.request('HEAD', fetch_url)
+                resp = conn.getresponse()
+            except:
+                raise PackageError, "Connection %s caused an error" % fetch_url               
             if resp.status in (301, 302):
                 fetch_url = resp.getheader("Location", None)
                 if fetch_url is not None:
