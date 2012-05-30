@@ -29,10 +29,7 @@ from BeautifulSoup import BeautifulSoup
 from glob import fnmatch
 from logger import getLogger
 import HTMLParser
-try: 
-   from hashlib import md5
-except ImportError:
-   from md5 import md5
+from hashlib import md5
 
 # timeout in seconds
 timeout = 10
@@ -129,6 +126,9 @@ class PypiPackageList(object):
         else:
             return filtered_packages
 
+
+class LockfileError(Exception):
+    pass
 
 class PackageError(Exception):
     pass
@@ -806,6 +806,9 @@ def run(args=None):
     package_list = set(package_list)
     mirror = Mirror(config["mirror_file_path"])
     lock = zc.lockfile.LockFile(os.path.join(config["mirror_file_path"], config["lock_file_name"]))
+    if lock is None:
+        raise LockfileError("Could not acquire lockfile")
+
     LOG = getLogger(filename=log_filename,
                     log_console=options.log_console)
 
