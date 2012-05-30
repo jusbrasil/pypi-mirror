@@ -7,7 +7,7 @@ Change history
 - fetch-since-days is configurable now.
 
 1.0.15 (20010-02-08)
--------------------
+--------------------
 
 - LP #385387: fixed issues with incompatible BeautifulSoup 3.1 version
 - fixed incompatiblity with new PyPI download URLs (../../packages/..)
