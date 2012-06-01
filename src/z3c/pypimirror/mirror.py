@@ -666,8 +666,7 @@ class MirrorFile(object):
         exist.
     """
     def __init__(self, mirror_package, filename):
-        raw_filename = urllib.unquote(filename)
-        self.path = mirror_package.path(os.path.basename(raw_filename))
+        self.path = mirror_package.path(filename).replace('%7E','~')
 
     @property
     def md5(self):
